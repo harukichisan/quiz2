@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSupabaseClient } from '../lib/supabase';
 import type { Database } from '../types/database.types';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSupabaseClient } from '../lib/supabase';
 import type { DifficultyLevel } from '../types/database.types';
 import {

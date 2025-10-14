@@ -1,5 +1,3 @@
-import type { DifficultyLevel } from '../../types/database.types';
-
 interface ModeSelectScreenProps {
   onSelectSinglePlayer: () => void;
   onSelectBattleMode: () => void;

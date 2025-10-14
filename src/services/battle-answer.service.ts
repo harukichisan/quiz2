@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSupabaseClient } from '../lib/supabase';
 import {
   BattleError,

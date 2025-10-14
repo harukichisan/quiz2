@@ -294,11 +294,7 @@ INSERT INTO questions (question, answer, category, difficulty) VALUES
   ('フェルマーの最終定理を証明した数学者は?', 'あんどりゅーわいるず', '数学', 'S'),
   ('ζ関数を研究する数学分野は?', 'かいせきすうろん', '数学', 'S'),
   ('リーマン幾何を創始した数学者は?', 'げおるぐりーまん', '数学', 'S'),
-  ('三次方程式の解法を体系化したルネサンス期の数学者は?', 'かるだーの', '数学', 'S')
-ON CONFLICT (question) DO UPDATE
-  SET answer = EXCLUDED.answer,
-      category = EXCLUDED.category,
-      difficulty = EXCLUDED.difficulty;
+  ('三次方程式の解法を体系化したルネサンス期の数学者は?', 'かるだーの', '数学', 'S');
 
 -- テクノロジー（20問）
 INSERT INTO questions (question, answer, category, difficulty) VALUES
@@ -321,8 +317,4 @@ INSERT INTO questions (question, answer, category, difficulty) VALUES
   ('チューリングが提案した抽象計算モデルは?', 'ちゅーりんぐきかい', 'テクノロジー', 'S'),
   ('機械学習で勾配爆発を抑える手法の一つは?', 'ぐらでぃえんとくりっぺぃんぐ', 'テクノロジー', 'S'),
   ('ビットコインが採用する合意アルゴリズムは?', 'ぷるーふおぶわーく', 'テクノロジー', 'S'),
-  ('OSI参照モデルは全部で何層?', 'ななそう', 'テクノロジー', 'S')
-ON CONFLICT (question) DO UPDATE
-  SET answer = EXCLUDED.answer,
-      category = EXCLUDED.category,
-      difficulty = EXCLUDED.difficulty;
+  ('OSI参照モデルは全部で何層?', 'ななそう', 'テクノロジー', 'S');

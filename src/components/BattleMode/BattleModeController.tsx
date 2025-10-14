@@ -48,7 +48,7 @@ export default function BattleModeController({
   } = useBattleRoom();
 
   // Realtime同期
-  const { connectionStatus, opponentStatus } = useRealtimeSync({
+  const { opponentStatus } = useRealtimeSync({
     roomId: room?.id || null,
     userId,
     onRoomUpdate: (updatedRoom) => {
@@ -67,7 +67,6 @@ export default function BattleModeController({
   const {
     timeLeft,
     isAnswered,
-    playerAnswer,
     recordAnswer,
     resetTimer,
   } = useBattleGame({
@@ -136,7 +135,7 @@ export default function BattleModeController({
 
   // 回答処理
   const handleAnswer = useCallback(
-    async (choice: string, isCorrect: boolean, answerTime: number) => {
+    async (_choice: string, isCorrect: boolean, answerTime: number) => {
       if (!room || !currentQuestion) return;
 
       await recordAnswer(
