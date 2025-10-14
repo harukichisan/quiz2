@@ -1,0 +1,565 @@
+/* ================================================
+   対戦モード専用スタイル
+   ================================================ */
+
+/* モード選択画面 */
+.mode-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mode-button {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-button:hover {
+  border-color: #4CAF50;
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mode-button__icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.mode-button__content {
+  flex: 1;
+  text-align: left;
+}
+
+.mode-button__title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.mode-button__description {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 待機室 */
+.waiting-room {
+  margin: 2rem 0;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.room-info__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.room-info__label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.room-info__value {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.room-code-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.room-code-display__code {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.2em;
+  color: #4CAF50;
+}
+
+.difficulty-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.difficulty-badge--c {
+  background: #E3F2FD;
+  color: #1976D2;
+}
+
+.difficulty-badge--b {
+  background: #E8F5E9;
+  color: #388E3C;
+}
+
+.difficulty-badge--a {
+  background: #FFF3E0;
+  color: #F57C00;
+}
+
+.difficulty-badge--s {
+  background: #FCE4EC;
+  color: #C2185B;
+}
+
+.player-status {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.player-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+}
+
+.player-card--ready {
+  border-color: #4CAF50;
+  background: #f1f8f1;
+}
+
+.player-card__icon {
+  font-size: 2.5rem;
+}
+
+.player-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.player-card__label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.player-card__status {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.waiting-room__instructions {
+  text-align: center;
+  padding: 1.5rem;
+  background: #E3F2FD;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.waiting-room__instructions p {
+  margin: 0.5rem 0;
+}
+
+.waiting-room__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* 対戦画面 */
+.battle-game {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.battle-game__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.battle-game__progress {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.battle-game__scores {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.battle-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.battle-score__label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.battle-score__value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.battle-score--player .battle-score__value {
+  color: #4CAF50;
+}
+
+.battle-score--opponent .battle-score__value {
+  color: #f44336;
+}
+
+.battle-score__separator {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #999;
+}
+
+.battle-game__timer {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.battle-game__timer-bar {
+  height: 100%;
+  transition: width 0.1s linear;
+  border-radius: 4px;
+}
+
+.battle-game__question {
+  margin-bottom: 2rem;
+}
+
+.battle-game__choices {
+  margin: 2rem 0;
+}
+
+.battle-game__opponent-status {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.opponent-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.opponent-status--waiting {
+  background: #FFF3E0;
+  color: #F57C00;
+}
+
+.opponent-status--answered {
+  background: #E8F5E9;
+  color: #388E3C;
+}
+
+.opponent-status__icon {
+  font-size: 1.2rem;
+}
+
+.battle-game__result {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.result-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  min-width: 200px;
+}
+
+.result-banner--correct {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.result-banner--wrong {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.result-banner__icon {
+  font-size: 3rem;
+}
+
+.result-banner__text {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.result-banner__answer {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 結果画面 */
+.battle-result {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.battle-result__header {
+  text-align: center;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.battle-result__header--win {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: white;
+}
+
+.battle-result__header--lose {
+  background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+  color: white;
+}
+
+.battle-result__header--draw {
+  background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%);
+  color: white;
+}
+
+.battle-result__icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.battle-result__title {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.battle-result__subtitle {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.battle-result__scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-card--winner {
+  position: relative;
+}
+
+.score-card--winner::before {
+  content: '👑';
+  position: absolute;
+  top: -2rem;
+  font-size: 2rem;
+}
+
+.score-card__label {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.score-card__score {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.score-card__total {
+  font-size: 1.2rem;
+  color: #999;
+}
+
+.score-card__divider {
+  font-size: 2rem;
+  color: #ccc;
+  font-weight: 300;
+}
+
+.battle-result__stats {
+  margin: 3rem 0;
+}
+
+.battle-result__stats-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.stats-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.stats-column {
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.stats-column__title {
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+}
+
+.stats-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.stats-list__label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.stats-list__value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.battle-result__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+/* ロビー */
+.battle-lobby__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.room-code-input {
+  margin: 2rem 0;
+}
+
+.room-code-input__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.room-code-input__field {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.2em;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.room-code-input__field:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .stats-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-game__scores {
+    gap: 0.5rem;
+  }
+
+  .battle-score__value {
+    font-size: 1.5rem;
+  }
+
+  .room-code-display__code {
+    font-size: 1.5rem;
+  }
+
+  .battle-result__title {
+    font-size: 2rem;
+  }
+
+  .score-card__score {
+    font-size: 2.5rem;
+  }
+}
