@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { BattleRoomInfo, OpponentStatus } from '../../types/battle.types';
 import { generateChoices, extractCharAtPosition, formatQuestionNumber } from '../../lib/battleUtils';
 
@@ -32,9 +32,9 @@ export default function BattleGameScreen({
 }: BattleGameScreenProps) {
   const [choices, setChoices] = useState<string[]>([]);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
-  const [startTime] = useState(Date.now());
+  const startTimeRef = useRef<number>(Date.now());
 
-  // 選択肢を生成
+  // 選択肢を生成し、各問題の開始時刻をリセット
   useEffect(() => {
     if (currentQuestion) {
       // 回答の最初の文字を正解として使用
@@ -42,6 +42,9 @@ export default function BattleGameScreen({
       const newChoices = generateChoices(correctChar);
       setChoices(newChoices);
       setSelectedChoice(null);
+
+      // 各問題の開始時刻をリセット
+      startTimeRef.current = Date.now();
     }
   }, [currentQuestion]);
 
@@ -54,8 +57,8 @@ export default function BattleGameScreen({
     const correctChar = extractCharAtPosition(currentQuestion.answer, 0);
     const isCorrect = choice === correctChar;
 
-    // 回答時間を計算
-    const answerTime = Date.now() - startTime;
+    // 回答時間を計算（各問題の開始時刻から計算）
+    const answerTime = Date.now() - startTimeRef.current;
 
     // 親コンポーネントに通知
     onAnswer(choice, isCorrect, answerTime);

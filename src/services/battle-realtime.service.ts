@@ -1,7 +1,12 @@
 import { RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase';
 import type { BattleRoomInfo, BattleAnswer } from '../types/battle.types';
 import { mapToBattleRoomInfo, mapToBattleAnswer } from '../types/battle.types';
+import type { Database } from '../types/database.types';
+
+type BattleRoomRow = Database['public']['Tables']['battle_rooms']['Row'];
+type BattleAnswerRow = Database['public']['Tables']['battle_answers']['Row'];
 
 type RoomUpdateCallback = (room: BattleRoomInfo) => void;
 type AnswerUpdateCallback = (answer: BattleAnswer) => void;
@@ -21,6 +26,7 @@ export class BattleRealtimeService {
   subscribe(
     roomId: string,
     userId: string,
+    sessionId: string,
     callbacks: {
       onRoomUpdate?: RoomUpdateCallback;
       onAnswerUpdate?: AnswerUpdateCallback;
@@ -40,7 +46,8 @@ export class BattleRealtimeService {
     this.channel = supabase.channel(channelName, {
       config: {
         presence: {
-          key: userId,
+          // Use sessionId as presence key to distinguish multi-device sessions of the same user
+          key: sessionId,
         },
       },
     });
@@ -55,7 +62,8 @@ export class BattleRealtimeService {
           table: 'battle_rooms',
           filter: `id=eq.${roomId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<BattleRoomRow>) => {
+          console.log('[Realtime] Received UPDATE:', payload);
           if (payload.new) {
             callbacks.onRoomUpdate?.(mapToBattleRoomInfo(payload.new));
           }
@@ -73,7 +81,8 @@ export class BattleRealtimeService {
           table: 'battle_answers',
           filter: `room_id=eq.${roomId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<BattleAnswerRow>) => {
+          console.log('[Realtime] Received INSERT:', payload);
           if (payload.new) {
             callbacks.onAnswerUpdate?.(mapToBattleAnswer(payload.new));
           }
@@ -99,19 +108,22 @@ export class BattleRealtimeService {
 
     // チャンネルを購読
     this.channel.subscribe(async (status) => {
+      console.log(`[Realtime] Channel status: ${status}`);
       if (status === 'SUBSCRIBED') {
-        console.log(`Subscribed to ${channelName}`);
+        console.log(`[Realtime] Successfully subscribed to ${channelName}`);
         // Presence情報を送信
         await this.channel?.track({
           online_at: new Date().toISOString(),
           user_id: userId,
+          session_id: sessionId,
+          has_answered: false,
         });
       } else if (status === 'CHANNEL_ERROR') {
-        console.error(`Channel error for ${channelName}`);
+        console.error(`[Realtime] Channel error for ${channelName}`);
       } else if (status === 'TIMED_OUT') {
-        console.error(`Channel timed out for ${channelName}`);
+        console.error(`[Realtime] Channel timed out for ${channelName}`);
       } else if (status === 'CLOSED') {
-        console.log(`Channel closed for ${channelName}`);
+        console.log(`[Realtime] Channel closed for ${channelName}`);
       }
     });
   }
@@ -139,6 +151,27 @@ export class BattleRealtimeService {
    */
   getPresenceState(): any {
     return this.channel?.presenceState() || {};
+  }
+
+  /**
+   * Presenceの状態を更新する（回答完了時など）
+   */
+  async updatePresence(update: Partial<{
+    has_answered: boolean;
+    online_at: string;
+  }>): Promise<void> {
+    if (!this.channel) {
+      console.warn('Cannot update presence: channel not initialized');
+      return;
+    }
+
+    const currentState = this.channel.presenceState();
+    const myPresence = Object.values(currentState)[0]?.[0] || {};
+
+    await this.channel.track({
+      ...myPresence,
+      ...update,
+    });
   }
 
   /**

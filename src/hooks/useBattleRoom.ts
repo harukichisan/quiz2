@@ -10,7 +10,7 @@ interface UseBattleRoomReturn {
   error: string | null;
   createRoom: (userId: string, sessionId: string, difficulty: DifficultyLevel) => Promise<BattleRoomInfo | null>;
   joinRoom: (roomCode: string, userId: string, sessionId: string) => Promise<BattleRoomInfo | null>;
-  startGame: (roomId: string) => Promise<BattleRoomInfo | null>;
+  startGame: (roomId: string, hostUserId: string) => Promise<BattleRoomInfo | null>;
   leaveRoom: (roomId: string, userId: string) => Promise<void>;
   refreshRoom: (roomId: string) => Promise<BattleRoomInfo | null>;
   clearError: () => void;
@@ -80,12 +80,12 @@ export function useBattleRoom(): UseBattleRoomReturn {
   );
 
   const startGame = useCallback(
-    async (roomId: string): Promise<BattleRoomInfo | null> => {
+    async (roomId: string, hostUserId: string): Promise<BattleRoomInfo | null> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const updatedRoom = await BattleRoomService.startGame(roomId);
+        const updatedRoom = await BattleRoomService.startGame(roomId, hostUserId);
         setRoom(updatedRoom);
         return updatedRoom;
       } catch (err) {

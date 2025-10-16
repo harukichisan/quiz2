@@ -30,8 +30,8 @@ supabase db push
 1. [Supabase Dashboard](https://app.supabase.com/) にログイン
 2. プロジェクトを選択
 3. 左メニューから「SQL Editor」を開く
-4. `supabase/migrations/001_battle_mode.sql` の内容をコピー＆ペースト
-5. 「Run」ボタンをクリックして実行
+4. 基本セットアップ: `supabase-battle-mode-setup.sql` の内容をコピー＆ペースト→実行
+5. **⚠️ セキュリティ必須**: `supabase/rls-hardening.sql` の内容をコピー＆ペースト→実行
 
 ### 2. Realtime機能の有効化
 
@@ -371,8 +371,26 @@ WHERE is_correct = true;
 
 ### セキュリティ強化
 
-1. **RLSポリシーの見直し**
-   - より厳密なアクセス制御が必要な場合は追加ポリシーを設定
+**⚠️ 必須**: `supabase/rls-hardening.sql`を適用して最小権限のRLSポリシーを設定してください
+
+1. **RLSポリシーの確認**
+   ```sql
+   -- セキュアなポリシーが適用されているか確認
+   SELECT tablename, policyname, cmd
+   FROM pg_policies
+   WHERE tablename IN ('battle_rooms', 'battle_answers')
+   ORDER BY tablename, policyname;
+
+   -- 以下のポリシーがあることを確認:
+   -- battle_rooms_select_participant
+   -- battle_rooms_select_waiting
+   -- battle_rooms_insert
+   -- battle_rooms_join_as_guest
+   -- battle_rooms_update
+   -- battle_rooms_delete_host
+   -- battle_answers_select
+   -- battle_answers_insert
+   ```
 
 2. **レート制限の実装**
    - ルーム作成のレート制限

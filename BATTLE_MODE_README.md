@@ -73,12 +73,24 @@ Supabase Schedulerで1分ごとに実行することを推奨。
 ## 🔐 セキュリティ設計
 
 ### Row Level Security (RLS)
-- **battle_rooms**: ホストまたはゲストとして参加しているルームのみ閲覧・更新可能
-- **battle_answers**: 参加しているルームの回答のみ閲覧・記録可能
+
+**⚠️ 重要**: `supabase/rls-hardening.sql`を必ず適用してください
+
+- **battle_rooms**:
+  - 参加者のみがルーム情報を閲覧・更新可能
+  - `status='waiting'`かつ有効期限内のルームのみ限定公開（ルームコードで参加可能）
+  - ゲストは空きルームにのみ参加可能
+  - ホストのみがルームを削除可能
+
+- **battle_answers**:
+  - 参加しているルームの回答のみ閲覧可能
+  - 自分の回答のみ記録可能
+  - 他人の回答を改ざん不可
 
 ### 認証
-- Supabase Auth を使用してユーザーを識別
-- 非ログインユーザーはセッションIDのみで動作可能（ゲストモード）
+- Supabase Anonymous Auth を使用して匿名ユーザーを識別
+- 各ユーザーに一意のUUIDとセッションIDを付与
+- RLSポリシーでアクセス制御を実施
 
 ## 🎮 ゲームフロー
 
@@ -140,7 +152,8 @@ Supabase Realtimeを使用して以下を監視:
 #### 1. データベースセットアップ
 
 Supabase Dashboardの SQL Editor で以下のファイルを実行:
-- **`supabase-battle-mode-setup.sql`** - 全ての設定を含む完全なセットアップSQL
+- **`supabase-battle-mode-setup.sql`** - 基本セットアップ（テーブル、RPC、Realtime）
+- **`supabase/rls-hardening.sql`** - セキュアなRLSポリシー（最小権限）⚠️必須
 
 #### 2. 認証設定
 

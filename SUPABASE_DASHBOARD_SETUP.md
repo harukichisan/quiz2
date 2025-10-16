@@ -16,11 +16,19 @@ Supabase CLIを使用せず、Webブラウザから直接セットアップす�
 
 ### 1.2 SQLファイルの内容をコピー
 
-`supabase-battle-mode-setup.sql` ファイルの内容を全てコピーします。
+以下のいずれかのSQLファイルの内容を全てコピーします:
+
+**推奨**: `supabase/rls-hardening.sql` - セキュアなRLSポリシー（最小権限）
+**代替**: `supabase-battle-mode-setup.sql` - 基本セットアップ（RLSはその後に適用）
 
 ```bash
 # macOSのターミナルでコピー
 cd /Users/harukichi/アプリ開発/quiz2
+
+# セキュアなRLSポリシーを適用（推奨）
+cat supabase/rls-hardening.sql | pbcopy
+
+# または基本セットアップ
 cat supabase-battle-mode-setup.sql | pbcopy
 ```
 
@@ -37,13 +45,15 @@ cat supabase-battle-mode-setup.sql | pbcopy
 ✅ テーブル作成完了
 ✅ インデックス作成完了
 ✅ RPC関数作成完了
-✅ RLSポリシー設定完了
+✅ RLSポリシー設定完了（最小権限）
 ✅ Realtime有効化完了
 ```
 
 **エラーが出た場合**:
 - 既存のテーブルやポリシーがある場合は無視して問題ありません
 - `DROP POLICY ... does not exist` のようなエラーは無視してOK
+
+**⚠️ セキュリティ注意**: `supabase-battle-mode-setup.sql`の後に必ず`supabase/rls-hardening.sql`を実行して、安全なRLSポリシーを適用してください。
 
 ## 🔐 ステップ2: Anonymous認証の有効化
 

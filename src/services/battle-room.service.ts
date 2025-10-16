@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getSupabaseClient } from '../lib/supabase';
 import type { DifficultyLevel } from '../types/database.types';
 import {
@@ -110,7 +109,7 @@ export class BattleRoomService {
   }
 
   /**
-   * ルームに参加する
+   * ルームに参加する (RPC経由)
    */
   static async joinRoom(
     roomCode: string,
@@ -120,67 +119,53 @@ export class BattleRoomService {
     const supabase = getSupabaseClient();
 
     try {
-      // ルームコードでルームを検索
-      const { data: rooms, error: selectError } = await supabase
-        .from('battle_rooms')
-        .select('*')
-        .eq('room_code', roomCode.toUpperCase())
-        .single();
+      // RPC関数を使用してセキュアに参加
+      const { data, error } = await supabase.rpc('join_battle_room', {
+        p_room_code: roomCode.toUpperCase(),
+        p_guest_user_id: guestUserId,
+        p_guest_session_id: guestSessionId,
+      });
 
-      if (selectError || !rooms) {
-        throw new BattleError(
-          BattleErrorCode.ROOM_NOT_FOUND,
-          '指定されたルームが見つかりません'
-        );
+      if (error) {
+        // RPC関数内のエラーメッセージをパース
+        const errorMessage = error.message || 'Unknown error';
+
+        if (errorMessage.includes('ROOM_NOT_FOUND')) {
+          throw new BattleError(
+            BattleErrorCode.ROOM_NOT_FOUND,
+            '指定されたルームが見つかりません'
+          );
+        } else if (errorMessage.includes('ROOM_ALREADY_STARTED')) {
+          throw new BattleError(
+            BattleErrorCode.ROOM_ALREADY_STARTED,
+            'このルームは既に開始されています'
+          );
+        } else if (errorMessage.includes('ROOM_FULL')) {
+          throw new BattleError(
+            BattleErrorCode.ROOM_FULL,
+            'このルームは既に満員です'
+          );
+        } else if (errorMessage.includes('ROOM_EXPIRED')) {
+          throw new BattleError(
+            BattleErrorCode.ROOM_EXPIRED,
+            'このルームは期限切れです'
+          );
+        } else {
+          throw new BattleError(
+            BattleErrorCode.UNKNOWN_ERROR,
+            `ルームへの参加に失敗しました: ${errorMessage}`
+          );
+        }
       }
 
-      const room = mapToBattleRoomInfo(rooms);
-
-      // ルームの状態チェック
-      if (room.status !== 'waiting') {
-        throw new BattleError(
-          BattleErrorCode.ROOM_ALREADY_STARTED,
-          'このルームは既に開始されています'
-        );
-      }
-
-      if (room.guestUserId) {
-        throw new BattleError(
-          BattleErrorCode.ROOM_FULL,
-          'このルームは既に満員です'
-        );
-      }
-
-      // 期限切れチェック
-      const now = new Date();
-      const expiresAt = new Date(room.expiresAt);
-      if (now > expiresAt) {
-        throw new BattleError(
-          BattleErrorCode.ROOM_EXPIRED,
-          'このルームは期限切れです'
-        );
-      }
-
-      // ゲストとして参加
-      const { data: updatedRoom, error: updateError } = await supabase
-        .from('battle_rooms')
-        .update({
-          guest_user_id: guestUserId,
-          guest_session_id: guestSessionId,
-          status: 'ready',
-        })
-        .eq('id', room.id)
-        .select()
-        .single();
-
-      if (updateError) {
+      if (!data) {
         throw new BattleError(
           BattleErrorCode.UNKNOWN_ERROR,
-          `ルームへの参加に失敗しました: ${updateError.message}`
+          'ルームデータの取得に失敗しました'
         );
       }
 
-      return mapToBattleRoomInfo(updatedRoom);
+      return mapToBattleRoomInfo(data);
     } catch (error) {
       if (error instanceof BattleError) {
         throw error;
@@ -193,26 +178,52 @@ export class BattleRoomService {
   }
 
   /**
-   * ゲームを開始する（ホストのみ）
+   * ゲームを開始する（ホストのみ、RPC経由）
    */
-  static async startGame(roomId: string): Promise<BattleRoomInfo> {
+  static async startGame(roomId: string, hostUserId: string): Promise<BattleRoomInfo> {
     const supabase = getSupabaseClient();
 
     try {
-      const { data, error } = await supabase
-        .from('battle_rooms')
-        .update({
-          status: 'playing',
-          started_at: new Date().toISOString(),
-        })
-        .eq('id', roomId)
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('start_battle_room', {
+        p_room_id: roomId,
+        p_host_user_id: hostUserId,
+      });
 
       if (error) {
+        const errorMessage = error.message || 'Unknown error';
+
+        if (errorMessage.includes('ROOM_NOT_FOUND')) {
+          throw new BattleError(
+            BattleErrorCode.ROOM_NOT_FOUND,
+            'ルームが見つかりません'
+          );
+        } else if (errorMessage.includes('UNAUTHORIZED')) {
+          throw new BattleError(
+            BattleErrorCode.UNKNOWN_ERROR,
+            'ホストのみがゲームを開始できます'
+          );
+        } else if (errorMessage.includes('ROOM_NOT_READY')) {
+          throw new BattleError(
+            BattleErrorCode.UNKNOWN_ERROR,
+            'ゲストの参加を待っています'
+          );
+        } else if (errorMessage.includes('INVALID_STATE')) {
+          throw new BattleError(
+            BattleErrorCode.UNKNOWN_ERROR,
+            'ゲームは既に開始されています'
+          );
+        } else {
+          throw new BattleError(
+            BattleErrorCode.UNKNOWN_ERROR,
+            `ゲームの開始に失敗しました: ${errorMessage}`
+          );
+        }
+      }
+
+      if (!data) {
         throw new BattleError(
           BattleErrorCode.UNKNOWN_ERROR,
-          `ゲームの開始に失敗しました: ${error.message}`
+          'ルームデータの取得に失敗しました'
         );
       }
 
@@ -229,46 +240,34 @@ export class BattleRoomService {
   }
 
   /**
-   * ルームから退出する
+   * ルームから退出する (RPC経由)
+   * ゲストのみが退出可能（ホストが退出する場合は別の処理）
    */
   static async leaveRoom(roomId: string, userId: string): Promise<void> {
     const supabase = getSupabaseClient();
 
     try {
-      // ルームの情報を取得
-      const { data: room, error: selectError } = await supabase
-        .from('battle_rooms')
-        .select('*')
-        .eq('id', roomId)
-        .single();
+      const { error } = await supabase.rpc('leave_battle_room', {
+        p_room_id: roomId,
+        p_user_id: userId,
+      });
 
-      if (selectError || !room) {
-        return; // ルームが存在しない場合は何もしない
-      }
+      if (error) {
+        const errorMessage = error.message || 'Unknown error';
 
-      const mappedRoom = mapToBattleRoomInfo(room);
-
-      // ホストが退出した場合はルームを abandoned にする
-      if (mappedRoom.hostUserId === userId) {
-        await supabase
-          .from('battle_rooms')
-          .update({
-            status: 'abandoned',
-            finished_at: new Date().toISOString(),
-          })
-          .eq('id', roomId);
-      }
-      // ゲストが退出した場合はゲスト情報をクリア
-      else if (mappedRoom.guestUserId === userId) {
-        await supabase
-          .from('battle_rooms')
-          .update({
-            guest_user_id: null,
-            guest_session_id: null,
-            status: mappedRoom.status === 'playing' ? 'abandoned' : 'waiting',
-            finished_at: mappedRoom.status === 'playing' ? new Date().toISOString() : null,
-          })
-          .eq('id', roomId);
+        // ROOM_NOT_FOUND や UNAUTHORIZED は警告として記録するが例外にしない
+        if (errorMessage.includes('ROOM_NOT_FOUND')) {
+          console.warn('Room not found when leaving:', roomId);
+          return;
+        } else if (errorMessage.includes('UNAUTHORIZED')) {
+          console.warn('User not authorized to leave room:', userId, roomId);
+          return;
+        } else if (errorMessage.includes('ROOM_ALREADY_STARTED')) {
+          console.warn('Cannot leave room that has already started');
+          return;
+        } else {
+          console.error('Failed to leave room:', errorMessage);
+        }
       }
     } catch (error) {
       console.error('Failed to leave room:', error);

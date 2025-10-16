@@ -181,7 +181,7 @@ ALTER TABLE battle_answers ENABLE ROW LEVEL SECURITY;
 
 -- 4.2 battle_rooms のポリシー
 
--- ルームコードを知っていれば待機中ルームを閲覧可能（参加前のプレイヤー向け）
+-- ホストまたはゲストとして参加しているルームを閲覧可能
 DROP POLICY IF EXISTS "ユーザーは参加しているルームを閲覧可能" ON battle_rooms;
 CREATE POLICY "ユーザーは参加しているルームを閲覧可能"
   ON battle_rooms
@@ -189,7 +189,6 @@ CREATE POLICY "ユーザーは参加しているルームを閲覧可能"
   USING (
     host_user_id = auth.uid()
     OR guest_user_id = auth.uid()
-    OR (status = 'waiting' AND guest_user_id IS NULL)
   );
 
 -- ホストとしてルームを作成可能
@@ -205,11 +204,6 @@ CREATE POLICY "ユーザーは参加しているルームを更新可能"
   ON battle_rooms
   FOR UPDATE
   USING (
-    host_user_id = auth.uid()
-    OR guest_user_id = auth.uid()
-    OR (guest_user_id IS NULL AND status = 'waiting')
-  )
-  WITH CHECK (
     host_user_id = auth.uid()
     OR guest_user_id = auth.uid()
   );

@@ -92,7 +92,7 @@ export default function BattleWaitingRoom({
 
           <div className="room-info__item">
             <span className="room-info__label">難易度</span>
-            <span className="room-info__value difficulty-badge difficulty-badge--{room.difficulty.toLowerCase()}">
+            <span className={`room-info__value difficulty-badge difficulty-badge--${room.difficulty.toLowerCase()}`}>
               {room.difficulty}
             </span>
           </div>

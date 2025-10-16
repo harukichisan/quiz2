@@ -95,7 +95,12 @@ export interface BattleResult {
 }
 
 // ヘルパー関数: データベース型からアプリケーション型への変換
-export function mapToBattleRoomInfo(row: any): BattleRoomInfo {
+import type { Database } from './database.types';
+
+type BattleRoomRow = Database['public']['Tables']['battle_rooms']['Row'];
+type BattleAnswerRow = Database['public']['Tables']['battle_answers']['Row'];
+
+export function mapToBattleRoomInfo(row: BattleRoomRow): BattleRoomInfo {
   return {
     id: row.id,
     roomCode: row.room_code,
@@ -116,7 +121,7 @@ export function mapToBattleRoomInfo(row: any): BattleRoomInfo {
   };
 }
 
-export function mapToBattleAnswer(row: any): BattleAnswer {
+export function mapToBattleAnswer(row: BattleAnswerRow): BattleAnswer {
   return {
     id: row.id,
     roomId: row.room_id,

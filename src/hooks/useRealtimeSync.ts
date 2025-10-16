@@ -5,6 +5,7 @@ import type { BattleRoomInfo, BattleAnswer, OpponentStatus, ConnectionStatus } f
 interface UseRealtimeSyncOptions {
   roomId: string | null;
   userId: string;
+  sessionId: string; // presence key
   onRoomUpdate?: (room: BattleRoomInfo) => void;
   onAnswerUpdate?: (answer: BattleAnswer) => void;
 }
@@ -22,6 +23,7 @@ interface UseRealtimeSyncReturn {
 export function useRealtimeSync({
   roomId,
   userId,
+  sessionId,
   onRoomUpdate,
   onAnswerUpdate,
 }: UseRealtimeSyncOptions): UseRealtimeSyncReturn {
@@ -37,11 +39,11 @@ export function useRealtimeSync({
   const handlePresenceUpdate = useCallback((presences: any) => {
     setPresenceData(presences);
 
-    // 相手のプレゼンス情報を抽出
-    const otherUsers = Object.keys(presences).filter((key) => key !== userId);
+    // 相手のプレゼンス情報を抽出（presenceのkeyはsessionId）
+    const otherSessions = Object.keys(presences).filter((key) => key !== sessionId);
 
-    if (otherUsers.length > 0) {
-      const opponentKey = otherUsers[0];
+    if (otherSessions.length > 0) {
+      const opponentKey = otherSessions[0];
       const opponentPresence = presences[opponentKey][0];
 
       setOpponentStatus({
@@ -58,7 +60,7 @@ export function useRealtimeSync({
         hasAnswered: false,
       });
     }
-  }, [userId]);
+  }, [sessionId]);
 
   useEffect(() => {
     if (!roomId) {
@@ -67,8 +69,8 @@ export function useRealtimeSync({
 
     const realtimeService = getBattleRealtimeService();
 
-    // 購読を開始
-    realtimeService.subscribe(roomId, userId, {
+    // 購読を開始（presence key = sessionId）
+    realtimeService.subscribe(roomId, userId, sessionId, {
       onRoomUpdate,
       onAnswerUpdate,
       onPresenceUpdate: handlePresenceUpdate,

@@ -51,6 +51,7 @@ export default function BattleModeController({
   const { opponentStatus } = useRealtimeSync({
     roomId: room?.id || null,
     userId,
+    sessionId,
     onRoomUpdate: (updatedRoom) => {
       setRoom(updatedRoom);
 
@@ -118,12 +119,12 @@ export default function BattleModeController({
   // ゲーム開始
   const handleStartGame = useCallback(async () => {
     if (!room) return;
-    const updatedRoom = await startGame(room.id);
+    const updatedRoom = await startGame(room.id, userId);
     if (updatedRoom?.status === 'playing') {
       setScreen('playing');
       resetTimer();
     }
-  }, [room, startGame, resetTimer]);
+  }, [room, startGame, resetTimer, userId]);
 
   // ルーム退出
   const handleLeaveRoom = useCallback(async () => {

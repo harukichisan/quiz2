@@ -1,7 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database.types';
 
-type SupabaseClientType = ReturnType<typeof createClient<Database>>;
+type SupabaseClientType = SupabaseClient<Database>;
 
 let supabase: SupabaseClientType | null = null;
 let initializationError: Error | null = null;
@@ -22,8 +22,12 @@ const initializeSupabase = () => {
   }
 
   try {
-    // @ts-ignore - Database型の問題を一時的に回避
-    supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+    supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : '未知のエラーが発生しました。';
     initializationError = new Error(`Supabaseクライアントの初期化に失敗しました: ${message}`);

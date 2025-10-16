@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { BattleRoomService } from '../services/battle-room.service';
 import { BattleAnswerService } from '../services/battle-answer.service';
+import { getBattleRealtimeService } from '../services/battle-realtime.service';
 import type { BattleRoomInfo, BattleAnswer } from '../types/battle.types';
 import { BattleError } from '../types/battle.types';
 
@@ -131,6 +132,10 @@ export function useBattleGame({
         if (timerRef.current) {
           cancelAnimationFrame(timerRef.current);
         }
+
+        // Presenceを更新して相手に回答完了を通知
+        const realtimeService = getBattleRealtimeService();
+        await realtimeService.updatePresence({ has_answered: true });
       } catch (err) {
         const errorMessage =
           err instanceof BattleError ? err.message : '回答の記録に失敗しました';
