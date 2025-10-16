@@ -12,28 +12,6 @@ type RoomUpdateCallback = (room: BattleRoomInfo) => void;
 type AnswerUpdateCallback = (answer: BattleAnswer) => void;
 type PresenceCallback = (presences: any) => void;
 
-function isBattleRoomRow(row: unknown): row is BattleRoomRow {
-  return (
-    typeof row === 'object' &&
-    row !== null &&
-    'id' in row &&
-    'room_code' in row &&
-    'host_user_id' in row &&
-    'status' in row
-  );
-}
-
-function isBattleAnswerRow(row: unknown): row is BattleAnswerRow {
-  return (
-    typeof row === 'object' &&
-    row !== null &&
-    'id' in row &&
-    'room_id' in row &&
-    'question_id' in row &&
-    'player_user_id' in row
-  );
-}
-
 /**
  * Realtime同期サービス
  * Supabase Realtimeを使用して対戦ルームの状態変更を監視する
@@ -86,13 +64,8 @@ export class BattleRealtimeService {
         },
         (payload: RealtimePostgresChangesPayload<BattleRoomRow>) => {
           console.log('[Realtime] Received UPDATE:', payload);
-          if (isBattleRoomRow(payload.new)) {
-            callbacks.onRoomUpdate?.(mapToBattleRoomInfo(payload.new));
-          } else {
-            console.warn(
-              '[Realtime] Received invalid room payload:',
-              payload.new
-            );
+          if (payload.new && Object.keys(payload.new).length !== 0) {
+            callbacks.onRoomUpdate?.(mapToBattleRoomInfo(payload.new as BattleRoomRow));
           }
         }
       );
@@ -110,13 +83,8 @@ export class BattleRealtimeService {
         },
         (payload: RealtimePostgresChangesPayload<BattleAnswerRow>) => {
           console.log('[Realtime] Received INSERT:', payload);
-          if (isBattleAnswerRow(payload.new)) {
-            callbacks.onAnswerUpdate?.(mapToBattleAnswer(payload.new));
-          } else {
-            console.warn(
-              '[Realtime] Received invalid answer payload:',
-              payload.new
-            );
+          if (payload.new && Object.keys(payload.new).length !== 0) {
+            callbacks.onAnswerUpdate?.(mapToBattleAnswer(payload.new as BattleAnswerRow));
           }
         }
       );

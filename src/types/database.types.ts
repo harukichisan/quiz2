@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type BattleRoomStatus = 'waiting' | 'ready' | 'playing' | 'finished' | 'abandoned';
+export type RawBattleRoomStatus =
+  | BattleRoomStatus
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled';
 export type DifficultyLevel = 'C' | 'B' | 'A' | 'S';
 
 export type Database = {
@@ -48,7 +53,7 @@ export type Database = {
           guest_user_id: string | null
           host_session_id: string
           guest_session_id: string | null
-          status: BattleRoomStatus
+          status: RawBattleRoomStatus
           current_question_index: number
           question_ids: string[]
           host_score: number
@@ -67,7 +72,7 @@ export type Database = {
           guest_user_id?: string | null
           host_session_id: string
           guest_session_id?: string | null
-          status?: BattleRoomStatus
+          status?: RawBattleRoomStatus
           current_question_index?: number
           question_ids: string[]
           host_score?: number
@@ -86,7 +91,7 @@ export type Database = {
           guest_user_id?: string | null
           host_session_id?: string
           guest_session_id?: string | null
-          status?: BattleRoomStatus
+          status?: RawBattleRoomStatus
           current_question_index?: number
           question_ids?: string[]
           host_score?: number

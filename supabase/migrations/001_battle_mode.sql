@@ -133,23 +133,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- ============================================
--- 期限切れルーム自動削除関数
--- ============================================
-
-CREATE OR REPLACE FUNCTION delete_expired_battle_rooms()
-RETURNS void AS $$
-BEGIN
-  DELETE FROM battle_rooms
-   WHERE expires_at < NOW()
-      OR (status = 'abandoned' AND finished_at < NOW() - INTERVAL '10 minutes');
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ============================================
--- Row Level Security (RLS) の設定
--- ============================================
-
 -- battle_roomsのRLS有効化
 ALTER TABLE battle_rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE battle_answers ENABLE ROW LEVEL SECURITY;

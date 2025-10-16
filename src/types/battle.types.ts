@@ -1,4 +1,17 @@
-import { BattleRoomStatus, DifficultyLevel } from './database.types';
+import { BattleRoomStatus, DifficultyLevel, RawBattleRoomStatus } from './database.types';
+
+function normalizeBattleRoomStatus(status: RawBattleRoomStatus): BattleRoomStatus {
+  switch (status) {
+    case 'in_progress':
+      return 'playing';
+    case 'completed':
+      return 'finished';
+    case 'cancelled':
+      return 'abandoned';
+    default:
+      return status;
+  }
+}
 
 // 対戦ルーム情報
 export interface BattleRoomInfo {
@@ -109,7 +122,7 @@ export function mapToBattleRoomInfo(row: BattleRoomRow): BattleRoomInfo {
     guestUserId: row.guest_user_id,
     hostSessionId: row.host_session_id,
     guestSessionId: row.guest_session_id,
-    status: row.status,
+    status: normalizeBattleRoomStatus(row.status),
     currentQuestionIndex: row.current_question_index,
     questionIds: Array.isArray(row.question_ids) ? row.question_ids : [],
     hostScore: row.host_score,

@@ -48,7 +48,9 @@ export default function BattleWaitingRoom({
     }
   };
 
-  const hasGuest = room.status === 'ready' && room.guestUserId;
+  const hasGuest = Boolean(room.guestUserId);
+  const isWaitingToStart = room.status === 'waiting' || room.status === 'ready';
+  const canStartGame = isHost && hasGuest && isWaitingToStart;
 
   return (
     <div className="surface surface--start">
@@ -132,13 +134,13 @@ export default function BattleWaitingRoom({
         {isHost && !hasGuest && (
           <div className="waiting-room__instructions">
             <p>👆 ルームコードを友達に共有してください</p>
-            <p>参加したら自動的にゲームを開始できます</p>
+            <p>参加者が揃ったら「ゲームを開始」を押してください</p>
           </div>
         )}
       </div>
 
       <div className="waiting-room__actions">
-        {isHost && hasGuest && (
+        {canStartGame && (
           <button
             type="button"
             className="button button--large button--primary"
